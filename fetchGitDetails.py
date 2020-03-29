@@ -20,23 +20,27 @@ def fetch_committees(list_of_repos, org_name, n, m):
     commits_instance = Commits()
     final_ans = my_dictionary()
     for repo in list_of_repos.keys():
-        print 'the repo is: ' + repo
+        #print 'the repo is: ' + repo
         commits = commits_instance.list(user=str(org_name), repo=str(repo), sha='master')
         user_commit_count_map = my_dictionary()
         for page in commits.iterator():
-            print 'user is: ' + page.author
-            if str(page.author.login) in user_commit_count_map.keys():
-                user_commit_count_map[str(page.author.login)] += 1
-            else:
-                user_commit_count_map.add(str(page.author.login), 1)
-        print 'list of commits per repo: ' + user_commit_count_map
+            #in some repos, user comes as None, so adding this condition if user exsits or not
+            if page.author:
+                if str(page.author.login) in user_commit_count_map.keys():
+                    user_commit_count_map[str(page.author.login)] += 1
+                else:
+                    user_commit_count_map.add(str(page.author.login), 1)
+        #print 'list of commits per repo: '
+        #print user_commit_count_map
         sorted_commits = sorted(user_commit_count_map.items(), key=operator.itemgetter(1), reverse=True)
         top_sorted_commits = dict(sorted_commits[0:m])
-        print 'top sorted users: ' + top_sorted_commits
+        # print 'top sorted users: '
+        # print top_sorted_commits
         final_ans.add(repo, top_sorted_commits)
-        print 'adding to the final : ' + final_ans
-
-    print final_ans
+    #     print 'adding to the final : '
+    #     print final_ans
+    #
+    # print final_ans
     return final_ans
 
 
@@ -47,14 +51,14 @@ def fetch_top_n_repos(organization, n, m):
         list_of_repo.add(str(repo.name), repo.forks)
 
     sorted_list_of_repo = sorted(list_of_repo.items(), key=operator.itemgetter(1), reverse=True)
-    print sorted_list_of_repo
+    #print sorted_list_of_repo
     return dict(sorted_list_of_repo[0:n])
 
 def main():
 
     org_name = raw_input("Enter the organization name: ")
-    num_of_repos = int(raw_input("ENter the no of repos"))
-    num_of_committees = int(raw_input("Enter the no of committees"))
+    num_of_repos = int(raw_input("Enter the no of repos: "))
+    num_of_committees = int(raw_input("Enter the no of committees: "))
 
     # To get n most popular repos of an Org based on the forks
     list_of_repos = fetch_top_n_repos(org_name, num_of_repos, num_of_committees)
